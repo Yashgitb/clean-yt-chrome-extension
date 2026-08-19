@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Shorts Hider</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      width: 320px;
+      height: 290px;
+      background: radial-gradient(circle at 100% 0%, rgba(255, 0, 79, 0.15), transparent 60%),
+                  radial-gradient(circle at 0% 100%, rgba(127, 0, 255, 0.15), transparent 60%),
+                  #0e0f14;
+      color: #f3f4f6;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Header styling */
+    .header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #ff0055, #7a00ff);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(255, 0, 85, 0.3);
+    }
+
+    .logo-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: #ffffff;
+    }
+
+    .logo-text {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff, #a1a1aa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-badge.disabled {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    /* Glass Card Container */
+    .glass-card {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      margin-bottom: 16px;
+    }
+
+    .stats-label {
+      font-size: 12px;
+      color: #71717a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .counter-display {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin: 4px 0;
+    }
+
+    .counter-number {
+      font-size: 40px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ffffff, #e4e4e7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      transition: transform 0.2s ease;
+    }
+
+    .counter-number.bump {
+      transform: scale(1.15);
+    }
+
+    .counter-unit {
+      font-size: 14px;
+      color: #a1a1aa;
+      font-weight: 500;
+    }
+
+    /* Reset button with glass styling */
+    .reset-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: #a1a1aa;
+      font-family: inherit;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .reset-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .reset-btn svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    /* Controls Panel */
+    .controls {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+
+    .control-label {
+      font-weight: 500;
+      font-size: 14px;
+      color: #e4e4e7;
+    }
+
+    /* Toggle Switch styling */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 48px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #27272a;
+      transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #a1a1aa;
+      transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(135deg, #ff0055, #7a00ff);
+      border-color: transparent;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(255, 0, 85, 0.4);
+    }
+
+    /* Subtle footer */
+    .footer {
+      font-size: 10px;
+      color: #52525b;
+      margin-top: auto;
+      letter-spacing: 0.5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+        </svg>
+      </div>
+      <div class="logo-text">Shorts Hider</div>
+    </div>
+    <div id="status-badge" class="status-badge">Active</div>
+  </div>
+
+  <!-- Glass Card containing Stats -->
+  <div class="glass-card">
+    <div class="stats-label">Shorts Blocked</div>
+    <div class="counter-display">
+      <div id="counter" class="counter-number">0</div>
+      <div class="counter-unit">items</div>
+    </div>
+    <button id="reset-btn" class="reset-btn" title="Reset Counter">
+      <svg viewBox="0 0 24 24">
+        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+      Reset Stat
+    </button>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="controls">
+    <div class="control-label">Block YouTube Shorts</div>
+    <label class="switch">
+      <input type="checkbox" id="enable-toggle" checked>
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">v1.0.0 • Focused Browsing</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

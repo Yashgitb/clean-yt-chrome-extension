@@ -1,0 +1,75 @@
+/* Scoped styles applied when the YouTube Shorts Hider is active */
+
+/* Hide the Shorts shelf on the desktop homepage */
+html.shorts-hider-active ytd-rich-shelf-renderer[is-shorts],
+html.shorts-hider-active ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+  display: none !important;
+}
+
+/* Hide Reels/Shorts shelves on search results and watch page recommendations */
+html.shorts-hider-active ytd-reel-shelf-renderer,
+html.shorts-hider-active ytd-rich-section-renderer:has(ytd-reel-shelf-renderer) {
+  display: none !important;
+}
+
+/* Hide Sidebar / Navigation links for Shorts (expanded guide) */
+html.shorts-hider-active ytd-guide-entry-renderer:has(a[href="/shorts"]),
+html.shorts-hider-active ytd-guide-entry-renderer:has(a[href="/shorts/"]) {
+  display: none !important;
+}
+
+/* Hide Sidebar / Navigation links for Shorts (mini guide on homepage) */
+html.shorts-hider-active ytd-mini-guide-entry-renderer:has(a[href="/shorts"]),
+html.shorts-hider-active ytd-mini-guide-entry-renderer:has(a[href="/shorts/"]) {
+  display: none !important;
+}
+
+/* Hide Shorts Tab on YouTube Channel pages */
+html.shorts-hider-active yt-tab-shape[tab-title="Shorts"],
+html.shorts-hider-active yt-tab-shape[tab-title="shorts"],
+html.shorts-hider-active tp-yt-paper-tab:has(div:has-text("Shorts")),
+html.shorts-hider-active tp-yt-paper-tab:has(div:has-text("shorts")) {
+  display: none !important;
+}
+
+/* Hide individual Shorts videos appearing in Subscriptions, Search grids, and Recommendations */
+html.shorts-hider-active ytd-rich-item-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active ytd-video-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active ytd-compact-video-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active ytd-grid-video-renderer:has(a[href^="/shorts/"]) {
+  display: none !important;
+}
+
+/* --- Mobile YouTube Selectors (m.youtube.com) --- */
+
+/* Hide pivot bar item (bottom navigation) for Shorts */
+html.shorts-hider-active ytm-pivot-bar-item-renderer[tab-id="FEshorts"],
+html.shorts-hider-active ytm-pivot-bar-entry-renderer:has(a[href="/shorts"]),
+html.shorts-hider-active ytm-pivot-bar-entry-renderer:has(a[href="/shorts/"]) {
+  display: none !important;
+}
+
+/* Hide Mobile Reels / Shorts shelves */
+html.shorts-hider-active ytm-reel-shelf-renderer {
+  display: none !important;
+}
+
+/* Hide individual Shorts in mobile feed/search */
+html.shorts-hider-active ytm-video-with-context-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active ytm-compact-video-renderer:has(a[href^="/shorts/"]) {
+  display: none !important;
+}
+
+/* --- Watch Page Sidebar Removal (Desktop) --- */
+
+/* Hide the recommendations sidebar on the video watch page */
+html.shorts-hider-active ytd-watch-flexy #secondary {
+  display: none !important;
+}
+
+/* Expand the video player, info, and comments section to full-width */
+html.shorts-hider-active ytd-watch-flexy #primary {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+

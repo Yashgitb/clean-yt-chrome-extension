@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Shorts Hider",
+  "version": "1.0.0",
+  "description": "Automatically blocks, redirects, and hides YouTube Shorts for a cleaner, focused viewing experience.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Shorts Hider"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://m.youtube.com/*"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
