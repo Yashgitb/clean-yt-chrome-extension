@@ -1,75 +1,157 @@
-/* Scoped styles applied when the YouTube Shorts Hider is active */
+/* Scoped styles applied when clean-yt is active */
 
-/* Hide the Shorts shelf on the desktop homepage */
-html.shorts-hider-active ytd-rich-shelf-renderer[is-shorts],
-html.shorts-hider-active ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+/* ==========================================================================
+   1. HOMEPAGE CONTROLS
+   ========================================================================== */
+
+/* Hide Homepage Feed */
+html.shorts-hider-active.hide-homepage-feed ytd-browse[page-subtype="home"] #primary,
+html.shorts-hider-active.hide-homepage-feed ytd-browse[page-subtype="home"] ytd-rich-grid-renderer,
+html.shorts-hider-active.hide-homepage-feed ytm-browse[page-subtype="home"] #app ytm-section-list-renderer {
   display: none !important;
 }
 
-/* Hide Reels/Shorts shelves on search results and watch page recommendations */
-html.shorts-hider-active ytd-reel-shelf-renderer,
-html.shorts-hider-active ytd-rich-section-renderer:has(ytd-reel-shelf-renderer) {
+/* Hide YouTube Shorts on Homepage and Global Nav */
+html.shorts-hider-active.hide-home-shorts ytd-browse[page-subtype="home"] ytd-rich-shelf-renderer[is-shorts],
+html.shorts-hider-active.hide-home-shorts ytd-browse[page-subtype="home"] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+html.shorts-hider-active.hide-home-shorts ytd-browse[page-subtype="home"] ytd-rich-item-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active.hide-home-shorts ytd-reel-shelf-renderer,
+html.shorts-hider-active.hide-home-shorts ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+html.shorts-hider-active.hide-home-shorts ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+html.shorts-hider-active.hide-home-shorts yt-tab-shape[tab-title="Shorts"],
+html.shorts-hider-active.hide-home-shorts yt-tab-shape[tab-title="shorts"],
+html.shorts-hider-active.hide-home-shorts tp-yt-paper-tab:has(div:has-text("Shorts")),
+html.shorts-hider-active.hide-home-shorts ytm-pivot-bar-item-renderer[tab-id="FEshorts"],
+html.shorts-hider-active.hide-home-shorts ytm-pivot-bar-entry-renderer:has(a[href^="/shorts"]),
+html.shorts-hider-active.hide-home-shorts ytm-reel-shelf-renderer,
+html.shorts-hider-active.hide-home-shorts ytm-video-with-context-renderer:has(a[href^="/shorts/"]) {
   display: none !important;
 }
 
-/* Hide Sidebar / Navigation links for Shorts (expanded guide) */
-html.shorts-hider-active ytd-guide-entry-renderer:has(a[href="/shorts"]),
-html.shorts-hider-active ytd-guide-entry-renderer:has(a[href="/shorts/"]) {
+/* Hide Explore More Topics (Topic Chips Cloud) */
+html.shorts-hider-active.hide-explore-topics ytd-feed-filter-chip-bar-renderer,
+html.shorts-hider-active.hide-explore-topics yt-chip-cloud-renderer,
+html.shorts-hider-active.hide-explore-topics #chips.ytd-feed-filter-chip-bar-renderer,
+html.shorts-hider-active.hide-explore-topics iron-selector#chips {
   display: none !important;
 }
 
-/* Hide Sidebar / Navigation links for Shorts (mini guide on homepage) */
-html.shorts-hider-active ytd-mini-guide-entry-renderer:has(a[href="/shorts"]),
-html.shorts-hider-active ytd-mini-guide-entry-renderer:has(a[href="/shorts/"]) {
+/* Clean Homepage Feed (Promos, Banners, Statements, Ads) */
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] ytd-banner-promo-renderer,
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] ytd-statement-banner-renderer,
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] ytd-brand-video-singleton-renderer,
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] #big-ytd-merch-shelf-renderer,
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] ytd-primetime-promo-renderer,
+html.shorts-hider-active.clean-homepage-feed ytd-browse[page-subtype="home"] ytd-in-feed-ad-layout-renderer {
   display: none !important;
 }
 
-/* Hide Shorts Tab on YouTube Channel pages */
-html.shorts-hider-active yt-tab-shape[tab-title="Shorts"],
-html.shorts-hider-active yt-tab-shape[tab-title="shorts"],
-html.shorts-hider-active tp-yt-paper-tab:has(div:has-text("Shorts")),
-html.shorts-hider-active tp-yt-paper-tab:has(div:has-text("shorts")) {
+/* ==========================================================================
+   2. VIDEO PAGE CONTROLS
+   ========================================================================== */
+
+/* SCENARIO 1: Hide Video Sidebar is ON and Hide Playlists is ALSO ON
+   -> Entire sidebar vanishes unconditionally */
+html.shorts-hider-active.hide-video-sidebar.hide-playlists ytd-watch-flexy #secondary,
+html.shorts-hider-active.hide-video-sidebar.hide-playlists ytd-watch-grid #secondary {
   display: none !important;
 }
 
-/* Hide individual Shorts videos appearing in Subscriptions, Search grids, and Recommendations */
-html.shorts-hider-active ytd-rich-item-renderer:has(a[href^="/shorts/"]),
-html.shorts-hider-active ytd-video-renderer:has(a[href^="/shorts/"]),
-html.shorts-hider-active ytd-compact-video-renderer:has(a[href^="/shorts/"]),
-html.shorts-hider-active ytd-grid-video-renderer:has(a[href^="/shorts/"]) {
+/* SCENARIO 2: Hide Video Sidebar is ON, but current video has NO active playlist
+   (Targeting: not .has-active-playlist and not [playlist])
+   -> Entire sidebar vanishes completely! */
+html.shorts-hider-active.hide-video-sidebar:not(.has-active-playlist) ytd-watch-flexy:not([playlist]):not([playlist-id]) #secondary,
+html.shorts-hider-active.hide-video-sidebar:not(.has-active-playlist) ytd-watch-grid:not([playlist]):not([playlist-id]) #secondary {
   display: none !important;
 }
 
-/* --- Mobile YouTube Selectors (m.youtube.com) --- */
-
-/* Hide pivot bar item (bottom navigation) for Shorts */
-html.shorts-hider-active ytm-pivot-bar-item-renderer[tab-id="FEshorts"],
-html.shorts-hider-active ytm-pivot-bar-entry-renderer:has(a[href="/shorts"]),
-html.shorts-hider-active ytm-pivot-bar-entry-renderer:has(a[href="/shorts/"]) {
-  display: none !important;
-}
-
-/* Hide Mobile Reels / Shorts shelves */
-html.shorts-hider-active ytm-reel-shelf-renderer {
-  display: none !important;
-}
-
-/* Hide individual Shorts in mobile feed/search */
-html.shorts-hider-active ytm-video-with-context-renderer:has(a[href^="/shorts/"]),
-html.shorts-hider-active ytm-compact-video-renderer:has(a[href^="/shorts/"]) {
-  display: none !important;
-}
-
-/* --- Watch Page Sidebar Removal (Desktop) --- */
-
-/* Hide the recommendations sidebar on the video watch page */
-html.shorts-hider-active ytd-watch-flexy #secondary {
-  display: none !important;
-}
-
-/* Expand the video player, info, and comments section to full-width */
-html.shorts-hider-active ytd-watch-flexy #primary {
+/* Expand Primary Video Player width when sidebar is completely hidden */
+html.shorts-hider-active.hide-video-sidebar.hide-playlists ytd-watch-flexy #primary,
+html.shorts-hider-active.hide-video-sidebar.hide-playlists ytd-watch-grid #primary,
+html.shorts-hider-active.hide-video-sidebar:not(.has-active-playlist) ytd-watch-flexy:not([playlist]):not([playlist-id]) #primary,
+html.shorts-hider-active.hide-video-sidebar:not(.has-active-playlist) ytd-watch-grid:not([playlist]):not([playlist-id]) #primary {
   max-width: 100% !important;
   width: 100% !important;
 }
 
+/* SCENARIO 3: Hide Video Sidebar is ON, Hide Playlists is OFF, and an active playlist IS present!
+   -> #secondary MUST be visible! */
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-flexy #secondary,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-grid #secondary,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist] #secondary,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist-id] #secondary {
+  display: block !important;
+}
+
+/* In Scenario 3, vanish all recommendation feeds, chips, ad items, and other sidebar content below the playlist */
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-flexy #secondary #related,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-grid #secondary #related,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist] #secondary #related,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist-id] #secondary #related,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-flexy #secondary ytd-item-section-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-grid #secondary ytd-item-section-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist] #secondary ytd-item-section-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist-id] #secondary ytd-item-section-renderer {
+  display: none !important;
+}
+
+/* In Scenario 3, explicitly display the active playlist panel */
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-flexy #secondary ytd-playlist-panel-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists).has-active-playlist ytd-watch-grid #secondary ytd-playlist-panel-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist] #secondary ytd-playlist-panel-renderer,
+html.shorts-hider-active.hide-video-sidebar:not(.hide-playlists) ytd-watch-flexy[playlist-id] #secondary ytd-playlist-panel-renderer {
+  display: flex !important;
+  visibility: visible !important;
+}
+
+/* Granular: Hide Recommended Videos in sidebar (when sidebar itself is not hidden) */
+html.shorts-hider-active.hide-recommended-videos:not(.hide-video-sidebar) ytd-watch-flexy #secondary ytd-compact-video-renderer,
+html.shorts-hider-active.hide-recommended-videos:not(.hide-video-sidebar) ytd-watch-grid #secondary ytd-compact-video-renderer,
+html.shorts-hider-active.hide-recommended-videos:not(.hide-video-sidebar) ytd-watch-flexy #secondary #related,
+html.shorts-hider-active.hide-recommended-videos:not(.hide-video-sidebar) ytd-watch-grid #secondary #related {
+  display: none !important;
+}
+
+/* Granular: Hide YouTube Shorts on Video Page */
+html.shorts-hider-active.hide-video-shorts ytd-watch-flexy #secondary ytd-reel-shelf-renderer,
+html.shorts-hider-active.hide-video-shorts ytd-watch-flexy #secondary ytd-rich-shelf-renderer,
+html.shorts-hider-active.hide-video-shorts ytd-watch-flexy #secondary ytd-compact-video-renderer:has(a[href^="/shorts/"]),
+html.shorts-hider-active.hide-video-shorts ytd-watch-flexy #secondary ytd-rich-section-renderer:has(ytd-reel-shelf-renderer),
+html.shorts-hider-active.hide-video-shorts ytd-watch-grid #secondary ytd-reel-shelf-renderer,
+html.shorts-hider-active.hide-video-shorts ytd-watch-grid #secondary ytd-rich-shelf-renderer,
+html.shorts-hider-active.hide-video-shorts ytd-watch-grid #secondary ytd-compact-video-renderer:has(a[href^="/shorts/"]) {
+  display: none !important;
+}
+
+/* Granular: Hide Playlists in sidebar */
+html.shorts-hider-active.hide-playlists ytd-watch-flexy #secondary ytd-compact-playlist-renderer,
+html.shorts-hider-active.hide-playlists ytd-watch-flexy #secondary ytd-compact-radio-renderer,
+html.shorts-hider-active.hide-playlists ytd-watch-flexy #secondary ytd-playlist-panel-renderer,
+html.shorts-hider-active.hide-playlists ytd-watch-grid #secondary ytd-compact-playlist-renderer,
+html.shorts-hider-active.hide-playlists ytd-watch-grid #secondary ytd-compact-radio-renderer,
+html.shorts-hider-active.hide-playlists ytd-watch-grid #secondary ytd-playlist-panel-renderer {
+  display: none !important;
+}
+
+/* Hide Comments */
+html.shorts-hider-active.hide-comments ytd-watch-flexy #comments,
+html.shorts-hider-active.hide-comments ytd-watch-grid #comments,
+html.shorts-hider-active.hide-comments ytd-comments {
+  display: none !important;
+}
+
+/* Hide Live Chat */
+html.shorts-hider-active.hide-live-chat ytd-watch-flexy #chat,
+html.shorts-hider-active.hide-live-chat ytd-watch-flexy #chat-container,
+html.shorts-hider-active.hide-live-chat ytd-live-chat-frame {
+  display: none !important;
+}
+
+/* Hide End Screen Cards & Suggestions */
+html.shorts-hider-active.hide-end-screens .ytp-ce-element,
+html.shorts-hider-active.hide-end-screens .ytp-ce-video,
+html.shorts-hider-active.hide-end-screens .ytp-ce-playlist,
+html.shorts-hider-active.hide-end-screens .ytp-ce-channel,
+html.shorts-hider-active.hide-end-screens .ytp-ce-covering-overlay {
+  display: none !important;
+}

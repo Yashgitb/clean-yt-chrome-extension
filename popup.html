@@ -3,10 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Shorts Hider</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>clean-yt</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,189 +11,193 @@
       padding: 0;
     }
 
-    body {
-      font-family: 'Outfit', sans-serif;
+    html, body {
       width: 320px;
-      height: 290px;
-      background: radial-gradient(circle at 100% 0%, rgba(255, 0, 79, 0.15), transparent 60%),
-                  radial-gradient(circle at 0% 100%, rgba(127, 0, 255, 0.15), transparent 60%),
-                  #0e0f14;
-      color: #f3f4f6;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
+      background-color: #000000;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      user-select: none;
+      overflow-x: hidden;
     }
 
-    /* Header styling */
-    .header {
-      width: 100%;
+    body {
+      padding: 14px 16px 16px 16px;
+      max-height: 560px;
+      overflow-y: auto;
+    }
+
+    /* Custom subtle dark scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #333338;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #55555e;
+    }
+
+    /* Top Master Control Header */
+    .top-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #1a1a1e;
+      margin-bottom: 14px;
     }
 
-    .logo-container {
+    .brand-container {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .logo-icon {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, #ff0055, #7a00ff);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(255, 0, 85, 0.3);
+    .brand-icon {
+      width: 20px;
+      height: 20px;
+      fill: #ff0000;
+      flex-shrink: 0;
     }
 
-    .logo-icon svg {
-      width: 16px;
-      height: 16px;
-      fill: #ffffff;
-    }
-
-    .logo-text {
-      font-size: 16px;
+    .brand-title {
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff, #a1a1aa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #ffffff;
+      letter-spacing: -0.2px;
     }
 
-    .status-badge {
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
+    .master-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-text {
+      font-size: 11.5px;
       font-weight: 600;
+      color: #666666;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: color 0.2s ease;
     }
 
-    .status-badge.disabled {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+    .status-text.active {
+      color: #ff0000;
     }
 
-    /* Glass Card Container */
-    .glass-card {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    /* Accordion / Dropdown Section */
+    .accordion-section {
       margin-bottom: 16px;
     }
 
-    .stats-label {
-      font-size: 12px;
-      color: #71717a;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 500;
-    }
-
-    .counter-display {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      margin: 4px 0;
-    }
-
-    .counter-number {
-      font-size: 40px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ffffff, #e4e4e7);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1;
-      transition: transform 0.2s ease;
-    }
-
-    .counter-number.bump {
-      transform: scale(1.15);
-    }
-
-    .counter-unit {
-      font-size: 14px;
-      color: #a1a1aa;
-      font-weight: 500;
-    }
-
-    /* Reset button with glass styling */
-    .reset-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      color: #a1a1aa;
-      font-family: inherit;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
+    .section-header {
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 7px;
+      cursor: pointer;
+      padding: 2px 0 8px 0;
+      color: #8e8e8e;
+      transition: color 0.15s ease;
     }
 
-    .reset-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
+    .section-header:hover {
       color: #ffffff;
-      border-color: rgba(255, 255, 255, 0.15);
     }
 
-    .reset-btn svg {
-      width: 12px;
-      height: 12px;
+    .chevron-icon {
+      width: 13px;
+      height: 13px;
       fill: currentColor;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
     }
 
-    /* Controls Panel */
-    .controls {
-      width: 100%;
+    .accordion-section.collapsed .chevron-icon {
+      transform: rotate(-90deg);
+    }
+
+    .section-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    /* Section Body with tree hierarchy guide line */
+    .section-body {
+      margin-left: 5px;
+      border-left: 1.5px solid #222226;
+      padding-left: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .accordion-section.collapsed .section-body {
+      display: none;
+    }
+
+    /* Option Row */
+    .option-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 4px;
+      min-height: 26px;
     }
 
-    .control-label {
-      font-weight: 500;
-      font-size: 14px;
-      color: #e4e4e7;
+    .option-label {
+      font-size: 13.5px;
+      color: #f1f1f1;
+      font-weight: 400;
+      line-height: 1.3;
+      padding-right: 8px;
+      transition: color 0.2s ease;
     }
 
-    /* Toggle Switch styling */
+    /* Inactive state visual feedback: when master is OFF, all function switches display as inactive */
+    body.master-inactive .option-label {
+      color: #777777;
+    }
+
+    body.master-inactive .section-body .slider {
+      background-color: #38383e !important;
+    }
+
+    body.master-inactive .section-body .slider:before {
+      transform: translateX(0) !important;
+    }
+
+    /* Sub-tree with indented connector line */
+    .sub-tree {
+      margin-left: 6px;
+      border-left: 2px solid #44444c;
+      padding-left: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+
+    /* Toggle Switch */
     .switch {
       position: relative;
       display: inline-block;
-      width: 48px;
-      height: 26px;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
     }
 
     .switch input {
       opacity: 0;
       width: 0;
       height: 0;
+      position: absolute;
     }
 
     .slider {
@@ -206,10 +207,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #27272a;
-      transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 34px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background-color: #38383e;
+      transition: background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
     }
 
     .slider:before {
@@ -219,72 +219,177 @@
       width: 18px;
       left: 3px;
       bottom: 3px;
-      background-color: #a1a1aa;
-      transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #ffffff;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
     }
 
     input:checked + .slider {
-      background: linear-gradient(135deg, #ff0055, #7a00ff);
-      border-color: transparent;
+      background-color: #ff0000;
     }
 
     input:checked + .slider:before {
-      transform: translateX(22px);
-      background-color: #ffffff;
-      box-shadow: 0 2px 8px rgba(255, 0, 85, 0.4);
-    }
-
-    /* Subtle footer */
-    .footer {
-      font-size: 10px;
-      color: #52525b;
-      margin-top: auto;
-      letter-spacing: 0.5px;
+      transform: translateX(20px);
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <div class="header">
-    <div class="logo-container">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
-        </svg>
-      </div>
-      <div class="logo-text">Shorts Hider</div>
-    </div>
-    <div id="status-badge" class="status-badge">Active</div>
-  </div>
-
-  <!-- Glass Card containing Stats -->
-  <div class="glass-card">
-    <div class="stats-label">Shorts Blocked</div>
-    <div class="counter-display">
-      <div id="counter" class="counter-number">0</div>
-      <div class="counter-unit">items</div>
-    </div>
-    <button id="reset-btn" class="reset-btn" title="Reset Counter">
-      <svg viewBox="0 0 24 24">
-        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+  <!-- Top Master Bar -->
+  <div class="top-bar">
+    <div class="brand-container">
+      <svg class="brand-icon" viewBox="0 0 24 24">
+        <path d="M21.58 7.19a2.7 2.7 0 0 0-1.9-1.9C18 4.8 12 4.8 12 4.8s-6 0-7.68.49a2.7 2.7 0 0 0-1.9 1.9C2 8.87 2 12 2 12s0 3.13.42 4.81a2.7 2.7 0 0 0 1.9 1.9C6 19.2 12 19.2 12 19.2s6 0 7.68-.49a2.7 2.7 0 0 0 1.9-1.9C22 15.13 22 12 22 12s0-3.13-.42-4.81zM10 15V9l5.2 3L10 15z"/>
       </svg>
-      Reset Stat
-    </button>
+      <span class="brand-title">clean-yt</span>
+    </div>
+    <div class="master-control">
+      <span id="master-status-text" class="status-text active">Active</span>
+      <label class="switch">
+        <input type="checkbox" id="master-toggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
-  <!-- Controls Section -->
-  <div class="controls">
-    <div class="control-label">Block YouTube Shorts</div>
-    <label class="switch">
-      <input type="checkbox" id="enable-toggle" checked>
-      <span class="slider"></span>
-    </label>
+  <!-- Section 1: HOMEPAGE -->
+  <div class="accordion-section" id="section-homepage">
+    <div class="section-header" data-target="section-homepage">
+      <svg class="chevron-icon" viewBox="0 0 24 24">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+      <span class="section-title">Homepage</span>
+    </div>
+    <div class="section-body">
+      <!-- Hide Homepage Feed -->
+      <div class="option-row">
+        <span class="option-label">Hide Homepage Feed</span>
+        <label class="switch">
+          <input type="checkbox" id="hideHomepageFeed" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Nested: Redirect to Subscriptions -->
+      <div class="sub-tree">
+        <div class="option-row">
+          <span class="option-label">Redirect to Subscriptions</span>
+          <label class="switch">
+            <input type="checkbox" id="redirectSubscriptions">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Hide YouTube Shorts -->
+      <div class="option-row">
+        <span class="option-label">Hide YouTube Shorts</span>
+        <label class="switch">
+          <input type="checkbox" id="hideHomeShorts" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Hide Explore More Topics -->
+      <div class="option-row">
+        <span class="option-label">Hide Explore More Topics</span>
+        <label class="switch">
+          <input type="checkbox" id="hideExploreTopics" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Clean Homepage Feed -->
+      <div class="option-row">
+        <span class="option-label">Clean Homepage Feed</span>
+        <label class="switch">
+          <input type="checkbox" id="cleanHomepageFeed" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
   </div>
 
-  <!-- Footer -->
-  <div class="footer">v1.0.0 • Focused Browsing</div>
+  <!-- Section 2: VIDEO PAGE -->
+  <div class="accordion-section" id="section-videopage">
+    <div class="section-header" data-target="section-videopage">
+      <svg class="chevron-icon" viewBox="0 0 24 24">
+        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+      </svg>
+      <span class="section-title">Video Page</span>
+    </div>
+    <div class="section-body">
+      <!-- Hide Video Sidebar -->
+      <div class="option-row">
+        <span class="option-label">Hide Video Sidebar</span>
+        <label class="switch">
+          <input type="checkbox" id="hideVideoSidebar">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Nested: Sidebar granular options -->
+      <div class="sub-tree">
+        <div class="option-row">
+          <span class="option-label">Hide Recommended Videos</span>
+          <label class="switch">
+            <input type="checkbox" id="hideRecommendedVideos" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Hide YouTube Shorts</span>
+          <label class="switch">
+            <input type="checkbox" id="hideVideoShorts" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="option-row">
+          <span class="option-label">Hide Playlists</span>
+          <label class="switch">
+            <input type="checkbox" id="hidePlaylists">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Hide Comments -->
+      <div class="option-row">
+        <span class="option-label">Hide Comments</span>
+        <label class="switch">
+          <input type="checkbox" id="hideComments">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Hide Live Chat -->
+      <div class="option-row">
+        <span class="option-label">Hide Live Chat</span>
+        <label class="switch">
+          <input type="checkbox" id="hideLiveChat" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Hide End Screen Cards -->
+      <div class="option-row">
+        <span class="option-label">Hide End Screen Cards</span>
+        <label class="switch">
+          <input type="checkbox" id="hideEndScreens">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <!-- Disable Autoplay -->
+      <div class="option-row">
+        <span class="option-label">Disable Autoplay</span>
+        <label class="switch">
+          <input type="checkbox" id="disableAutoplay" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>

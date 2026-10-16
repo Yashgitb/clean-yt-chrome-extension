@@ -1,123 +1,215 @@
-// YouTube Shorts Hider - content.js
+// clean-yt - content.js
 
-let enabled = true;
-let pendingCount = 0;
-let saveTimeout = null;
+const DEFAULT_SETTINGS = {
+  enabled: true,
+  hideHomepageFeed: true,
+  redirectSubscriptions: false,
+  hideHomeShorts: true,
+  hideExploreTopics: true,
+  cleanHomepageFeed: true,
+  hideVideoSidebar: false,
+  hideRecommendedVideos: true,
+  hideVideoShorts: true,
+  hidePlaylists: false,
+  hideComments: false,
+  hideLiveChat: true,
+  hideEndScreens: false,
+  disableAutoplay: true
+};
+
+let currentSettings = Object.assign({}, DEFAULT_SETTINGS);
 let currentUrl = window.location.href;
 
-// Initialize state
-chrome.storage.local.get({ enabled: true }, (data) => {
-  enabled = data.enabled;
-  updateHtmlClass();
-  if (enabled) {
-    checkAndRedirect();
-    countAndHideElements();
-  }
+// Initialize settings
+chrome.storage.local.get(DEFAULT_SETTINGS, (data) => {
+  currentSettings = Object.assign({}, DEFAULT_SETTINGS, data);
+  applySettings();
 });
 
-// Update root HTML class to activate CSS rules
-function updateHtmlClass() {
-  if (enabled) {
-    document.documentElement.classList.add('shorts-hider-active');
+// Apply classes and triggers based on settings
+function applySettings() {
+  const root = document.documentElement;
+  if (!root) return;
+
+  if (currentSettings.enabled) {
+    root.classList.add('shorts-hider-active');
   } else {
-    document.documentElement.classList.remove('shorts-hider-active');
+    root.classList.remove('shorts-hider-active');
+    removeAllFeatureClasses(root);
+    return;
+  }
+
+  // Feature class mappings
+  toggleHtmlClass(root, 'hide-homepage-feed', currentSettings.hideHomepageFeed);
+  toggleHtmlClass(root, 'hide-home-shorts', currentSettings.hideHomeShorts);
+  toggleHtmlClass(root, 'hide-explore-topics', currentSettings.hideExploreTopics);
+  toggleHtmlClass(root, 'clean-homepage-feed', currentSettings.cleanHomepageFeed);
+  toggleHtmlClass(root, 'hide-video-sidebar', currentSettings.hideVideoSidebar);
+  toggleHtmlClass(root, 'hide-recommended-videos', currentSettings.hideRecommendedVideos);
+  toggleHtmlClass(root, 'hide-video-shorts', currentSettings.hideVideoShorts);
+  toggleHtmlClass(root, 'hide-playlists', currentSettings.hidePlaylists);
+  toggleHtmlClass(root, 'hide-comments', currentSettings.hideComments);
+  toggleHtmlClass(root, 'hide-live-chat', currentSettings.hideLiveChat);
+  toggleHtmlClass(root, 'hide-end-screens', currentSettings.hideEndScreens);
+
+  // Actions
+  handleRedirections();
+  handleAutoplay();
+  updatePlaylistState();
+}
+
+function toggleHtmlClass(el, className, condition) {
+  if (condition) {
+    el.classList.add(className);
+  } else {
+    el.classList.remove(className);
   }
 }
 
-// Redirect client if they land on or click a Shorts URL
-function checkAndRedirect() {
-  if (!enabled) return;
+function removeAllFeatureClasses(root) {
+  const classes = [
+    'hide-homepage-feed',
+    'hide-home-shorts',
+    'hide-explore-topics',
+    'clean-homepage-feed',
+    'hide-video-sidebar',
+    'hide-recommended-videos',
+    'hide-video-shorts',
+    'hide-playlists',
+    'hide-comments',
+    'hide-live-chat',
+    'hide-end-screens',
+    'has-active-playlist'
+  ];
+  classes.forEach(cls => root.classList.remove(cls));
+}
+
+// Handle Shorts URL and Subscriptions redirections
+function handleRedirections() {
+  if (!currentSettings.enabled) return;
 
   const path = window.location.pathname;
-  if (path.startsWith('/shorts/')) {
+
+  // 1. Redirect Shorts to regular video player
+  if ((currentSettings.hideHomeShorts || currentSettings.hideVideoShorts) && path.startsWith('/shorts/')) {
     const videoId = path.split('/')[2];
     if (videoId) {
-      // Increment blocked count by 1 for the page redirect
-      chrome.storage.local.get({ blockedCount: 0 }, (countData) => {
-        chrome.storage.local.set({ blockedCount: countData.blockedCount + 1 });
-      });
-
-      // Redirect immediately to standard watch page
       window.location.replace(`https://www.youtube.com/watch?v=${videoId}`);
+      return;
+    }
+  }
+
+  // 2. Redirect Homepage to Subscriptions feed if option enabled
+  if (currentSettings.hideHomepageFeed && currentSettings.redirectSubscriptions) {
+    if (path === '/' || path === '') {
+      window.location.replace('https://www.youtube.com/feed/subscriptions');
+      return;
     }
   }
 }
 
-// Count and mark Shorts elements in the DOM to update stats in the popup
-function countAndHideElements() {
-  if (!enabled) return;
+// Turn off autoplay on video player if enabled
+function handleAutoplay() {
+  if (!currentSettings.enabled || !currentSettings.disableAutoplay) return;
 
-  // Selectors targeting Shorts containers and elements
-  const selectors = [
-    'ytd-rich-shelf-renderer[is-shorts]',
-    'ytd-reel-shelf-renderer',
-    'ytd-rich-item-renderer:has(a[href^="/shorts/"])',
-    'ytd-video-renderer:has(a[href^="/shorts/"])',
-    'ytd-compact-video-renderer:has(a[href^="/shorts/"])',
-    'ytd-grid-video-renderer:has(a[href^="/shorts/"])',
-    'ytm-reel-shelf-renderer',
-    'ytm-pivot-bar-item-renderer[tab-id="FEshorts"]'
-  ];
+  const autoplayToggle = document.querySelector('.ytp-autonav-toggle-button[aria-checked="true"]');
+  if (autoplayToggle) {
+    autoplayToggle.click();
+  }
+}
 
-  let foundNew = 0;
-  selectors.forEach(selector => {
-    try {
-      const elements = document.querySelectorAll(`${selector}:not([data-shorts-counted])`);
-      elements.forEach(el => {
-        el.setAttribute('data-shorts-counted', 'true');
-        foundNew++;
-      });
-    } catch (e) {
-      // Fallback in case browser version doesn't support complex CSS selectors
+// Listen for dynamic storage updates
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace !== 'local') return;
+
+  let hasChanged = false;
+  Object.keys(currentSettings).forEach(key => {
+    if (changes[key] !== undefined) {
+      currentSettings[key] = changes[key].newValue;
+      hasChanged = true;
     }
   });
 
-  if (foundNew > 0) {
-    pendingCount += foundNew;
-    if (saveTimeout) clearTimeout(saveTimeout);
-    
-    // Batch and save to storage to prevent rate limiting
-    saveTimeout = setTimeout(() => {
-      chrome.storage.local.get({ blockedCount: 0 }, (countData) => {
-        chrome.storage.local.set({ blockedCount: countData.blockedCount + pendingCount }, () => {
-          pendingCount = 0;
-        });
-      });
-    }, 300);
+  if (hasChanged) {
+    applySettings();
+  }
+});
+
+// Detect if current video is part of an active playlist
+function updatePlaylistState() {
+  const root = document.documentElement;
+  if (!root) return;
+
+  if (!currentSettings.enabled) {
+    root.classList.remove('has-active-playlist');
+    return;
+  }
+
+  let hasPlaylist = false;
+  try {
+    const url = new URL(window.location.href);
+    const listParam = url.searchParams.get('list');
+    const isWatch = url.pathname.includes('/watch');
+    const hasListParam = isWatch && !!listParam && listParam.trim().length > 0;
+
+    const watchEl = document.querySelector('ytd-watch-flexy, ytd-watch-grid');
+    const hasWatchAttr = watchEl !== null && (watchEl.hasAttribute('playlist') || watchEl.hasAttribute('playlist-id'));
+
+    const hasPlaylistItems = document.querySelector(
+      'ytd-playlist-panel-renderer ytd-playlist-panel-video-renderer'
+    ) !== null;
+
+    hasPlaylist = hasListParam || hasWatchAttr || hasPlaylistItems;
+  } catch (e) {
+    hasPlaylist = false;
+  }
+
+  toggleHtmlClass(root, 'has-active-playlist', hasPlaylist);
+
+  if (hasPlaylist) {
+    ensurePlaylistExpanded();
   }
 }
 
-// Listen for dynamic storage changes (e.g. from Popup toggle)
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === 'local' && changes.enabled) {
-    enabled = changes.enabled.newValue;
-    updateHtmlClass();
-    if (enabled) {
-      checkAndRedirect();
-      countAndHideElements();
+// Ensure active playlist panel is not hidden or collapsed by YouTube
+function ensurePlaylistExpanded() {
+  if (!currentSettings.enabled || !currentSettings.hideVideoSidebar || currentSettings.hidePlaylists) return;
+  const panel = document.querySelector('ytd-playlist-panel-renderer#playlist, ytd-playlist-panel-renderer');
+  if (panel) {
+    if (panel.hasAttribute('hidden')) {
+      panel.removeAttribute('hidden');
+    }
+    if (panel.hasAttribute('collapsed')) {
+      panel.removeAttribute('collapsed');
     }
   }
+}
+
+// Single Page Application navigation events
+window.addEventListener('yt-navigate-start', () => {
+  handleRedirections();
+  updatePlaylistState();
 });
 
-// Intercept YouTube SPA (Single Page Application) navigation
-window.addEventListener('yt-navigate-start', checkAndRedirect);
 window.addEventListener('yt-navigate-finish', () => {
-  checkAndRedirect();
-  countAndHideElements();
+  handleRedirections();
+  handleAutoplay();
+  updatePlaylistState();
+  // YouTube occasionally attaches the playlist panel slightly after navigate finish
+  setTimeout(updatePlaylistState, 300);
+  setTimeout(updatePlaylistState, 800);
 });
 
-// Setup MutationObserver to detect dynamic page changes (URL updates and dynamic AJAX loading of Shorts panels)
+// Mutation Observer for dynamic DOM additions and URL changes
 const observer = new MutationObserver(() => {
   if (window.location.href !== currentUrl) {
     currentUrl = window.location.href;
-    checkAndRedirect();
-  }
-  if (enabled) {
-    countAndHideElements();
+    handleRedirections();
+    handleAutoplay();
+    updatePlaylistState();
   }
 });
 
-// Start observing when document is ready
 if (document.documentElement) {
   observer.observe(document.documentElement, { childList: true, subtree: true });
 } else {
