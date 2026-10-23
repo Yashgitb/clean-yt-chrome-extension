@@ -11,7 +11,7 @@ Clean up YouTube and spend less time on distractions with this Chrome extension.
 2. In Chrome, open `chrome://extensions`.
 3. Turn on **Developer mode**.
 4. Click **Load unpacked**.
-5. Select the `shorts-hider` folder created by the clone. It contains `manifest.json`.
+5. Select the `clean-yt-chrome-extension` folder created by the clone. It contains `manifest.json`.
 6. Open YouTube. Click the extension icon to see its settings.
 
 ## Use the extension
