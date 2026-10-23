@@ -6,7 +6,7 @@ Clean up YouTube and spend less time on distractions with this Chrome extension.
 
 1. Open a terminal and clone the repository:
    ```bash
-   git clone https://github.com/Yashgitb/shorts-hider.git
+   git clone https://github.com/Yashgitb/clean-yt-chrome-extension.git
    ```
 2. In Chrome, open `chrome://extensions`.
 3. Turn on **Developer mode**.
